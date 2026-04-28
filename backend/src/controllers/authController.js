@@ -10,6 +10,9 @@ import {
 } from "../utils/validators.js";
 import { successResponse, errorResponse } from "../utils/responseUtils.js";
 import dayjs from "dayjs";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
+import sendEmail from "../utils/sendEmail.js";
 
 //route = POST /api/auth/register
 export const register = asyncHandler(async (req, res) => {
@@ -257,24 +260,47 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     return errorResponse(res, 400, "Please provide your email");
   }
 
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await User.findOne({
+    email: email.toLowerCase()
+  });
 
   if (!user) {
-    return successResponse(res, 200, "If an account exists with this email, a reset link will be sent");
+    return successResponse(
+      res,
+      200,
+      "If an account exists with this email, a reset link will be sent"
+    );
   }
 
- 
-  const resetToken = generateAccessToken(user._id);
-  user.resetPasswordToken = resetToken;
-  user.resetPasswordExpire = dayjs().add(1, "hour");
+  // create raw token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  user.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  user.resetPasswordExpire = dayjs().add(1, "hour").toDate();
+
   await user.save();
 
-  console.log(`Password reset token for ${email}: ${resetToken}`);
+  const resetUrl =
+    `http://localhost:5173/reset-password/${resetToken}`;
+
+  console.log(`Reset URL: ${resetUrl}`);
+
+  const message = `
+    Click below to reset password:
+
+    ${resetUrl}
+    `;
+
+  await sendEmail(user.email, "Password Reset", message);
 
   return successResponse(
     res,
     200,
-    "Password reset link sent to your email (check console in development)"
+    "Password reset link sent to your email"
   );
 });
 
@@ -283,35 +309,70 @@ export const resetPassword = asyncHandler(async (req, res) => {
   const { token } = req.params;
   const { newPassword, confirmPassword } = req.body;
 
-  if (!newPassword || !confirmPassword) {
-    return errorResponse(res, 400, "Please provide new password");
+  // token check
+  if (!token) {
+    return errorResponse(res, 400, "Reset token is required");
   }
 
+  // password fields check
+  if (!newPassword || !confirmPassword) {
+    return errorResponse(res, 400, "Please provide both passwords");
+  }
+
+  // password match check
   if (newPassword !== confirmPassword) {
     return errorResponse(res, 400, "Passwords do not match");
   }
 
+  // strong password validation
   if (!validatePassword(newPassword)) {
     return errorResponse(
       res,
       400,
-      "Password must be at least 6 characters and contain uppercase, lowercase, and numbers"
+      "Password must be at least 6 characters and contain uppercase, lowercase, and number"
     );
   }
 
+  // hash incoming token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+    console.log("hashToken", hashedToken);
+    
+
+  // find user directly
   const user = await User.findOne({
-    resetPasswordToken: token,
-    resetPasswordExpire: { $gt: new Date() },
-  });
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  }).select("+password");
 
   if (!user) {
     return errorResponse(res, 400, "Invalid or expired reset token");
   }
 
-  user.password = newPassword;
-  user.resetPasswordToken = null;
-  user.resetPasswordExpire = null;
+  // prevent same password reuse
+  const samePassword = await bcrypt.compare(newPassword, user.password);
+
+  if (samePassword) {
+    return errorResponse(
+      res,
+      400,
+      "New password must be different from old password"
+    );
+  }
+
+  // set new password
+  user.password = newPassword; // pre-save hook hashes it
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
   await user.save();
 
-  return successResponse(res, 200, "Password reset successfully");
+  return successResponse(
+    res,
+    200,
+    "Password reset successfully"
+  );
 });
