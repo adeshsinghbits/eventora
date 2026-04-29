@@ -5,16 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from "react-hot-toast";
+import { login, fetchProfile } from '../../features/auth/authThunks';
+import { useDispatch } from 'react-redux';
 
-const registerSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, 'First name is required')
-    .min(2, 'First name must be at least 2 characters'),
-  lastName: z
-    .string()
-    .min(1, 'Last name is required')
-    .min(2, 'Last name must be at least 2 characters'),
+const loginSchema = z.object({
   email: z
     .string()
     .min(1, 'Email is required')
@@ -22,19 +17,13 @@ const registerSchema = z.object({
   password: z
     .string()
     .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[0-9]/, 'Password must contain a number'),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+    .min(6, 'Password must be at least 6 characters'),
 });
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -43,24 +32,19 @@ const RegisterPage = () => {
     formState: { errors },
     reset,
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(loginSchema),
     mode: 'onBlur',
   });
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      toast.success('Account created successfully! 🎉');
+      await dispatch(login(data)).unwrap();
+      await dispatch(fetchProfile());
       reset();
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 1000);
+      navigate('/user-dashboard');
     } catch (error) {
-      toast.error('Registration failed. Please try again.');
+      toast.error('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +55,7 @@ const RegisterPage = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
+        staggerChildren: 0.1,
         delayChildren: 0.2,
       },
     },
@@ -117,72 +101,17 @@ const RegisterPage = () => {
             {/* Header */}
             <motion.div variants={itemVariants} className="mb-8 text-center">
               <h1 className="text-3xl font-bold bg-linear-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent mb-2">
-                Create Account
+                Welcome Back
               </h1>
-              <p className="text-slate-500 text-sm">Join us and start your journey today</p>
+              <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
             </motion.div>
 
             {/* Form */}
             <motion.form
               variants={itemVariants}
               onSubmit={handleSubmit(onSubmit)}
-              className="space-y-4"
+              className="space-y-5"
             >
-              {/* Name Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* First Name */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    First Name
-                  </label>
-                  <input
-                    {...register('firstName')}
-                    type="text"
-                    placeholder="John"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:outline-none text-sm ${
-                      errors.firstName
-                        ? 'border-red-500 bg-red-50 focus:border-red-600'
-                        : 'border-slate-200 bg-slate-50 focus:border-slate-400 focus:bg-white'
-                    }`}
-                  />
-                  {errors.firstName && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-xs font-medium"
-                    >
-                      {errors.firstName.message}
-                    </motion.p>
-                  )}
-                </div>
-
-                {/* Last Name */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Last Name
-                  </label>
-                  <input
-                    {...register('lastName')}
-                    type="text"
-                    placeholder="Doe"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:outline-none text-sm ${
-                      errors.lastName
-                        ? 'border-red-500 bg-red-50 focus:border-red-600'
-                        : 'border-slate-200 bg-slate-50 focus:border-slate-400 focus:bg-white'
-                    }`}
-                  />
-                  {errors.lastName && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-xs font-medium"
-                    >
-                      {errors.lastName.message}
-                    </motion.p>
-                  )}
-                </div>
-              </div>
-
               {/* Email Field */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700">
@@ -211,9 +140,17 @@ const RegisterPage = () => {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700">
-                  Password
-                </label>
+                <div className="flex justify-between items-center">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
+                  >
+                    Forgot?
+                  </Link>
+                </div>
                 <div className="relative">
                   <input
                     {...register('password')}
@@ -248,51 +185,12 @@ const RegisterPage = () => {
                 )}
               </div>
 
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    {...register('confirmPassword')}
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 focus:outline-none ${
-                      errors.confirmPassword
-                        ? 'border-red-500 bg-red-50 focus:border-red-600'
-                        : 'border-slate-200 bg-slate-50 focus:border-slate-400 focus:bg-white'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    {showConfirmPassword ? (
-                      <AiOutlineEyeInvisible size={20} />
-                    ) : (
-                      <AiOutlineEye size={20} />
-                    )}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 text-xs font-medium"
-                  >
-                    {errors.confirmPassword.message}
-                  </motion.p>
-                )}
-              </div>
-
               {/* Submit Button */}
               <motion.button
                 variants={itemVariants}
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-linear-to-r from-slate-900 to-slate-800 text-white cursor-pointer py-3 rounded-lg font-semibold hover:from-slate-800 hover:to-slate-700 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+                className="w-full bg-linear-to-r from-slate-900 to-slate-800 text-white cursor-pointer py-3 rounded-lg font-semibold hover:from-slate-800 hover:to-slate-700 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
@@ -301,10 +199,10 @@ const RegisterPage = () => {
                       transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                       className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                     />
-                    Creating account...
+                    Signing in...
                   </>
                 ) : (
-                  'Create Account'
+                  'Sign In'
                 )}
               </motion.button>
             </motion.form>
@@ -315,18 +213,18 @@ const RegisterPage = () => {
                 <div className="w-full border-t border-slate-200"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white text-slate-500">Or sign up with</span>
+                <span className="px-2 bg-white text-slate-500">Or continue with</span>
               </div>
             </motion.div>
 
-            {/* Sign In Link */}
+            {/* Sign Up Link */}
             <motion.div variants={itemVariants} className="mt-6 text-center text-sm">
-              <span className="text-slate-600">Already have an account? </span>
+              <span className="text-slate-600">Don't have an account? </span>
               <Link
-                to="/login"
+                to="/register"
                 className="text-slate-900 font-semibold hover:underline transition-colors"
               >
-                Sign in
+                Create one
               </Link>
             </motion.div>
           </motion.div>
@@ -361,4 +259,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;

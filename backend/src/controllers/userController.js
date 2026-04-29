@@ -103,32 +103,6 @@ export const uploadAvatar = asyncHandler(async (req, res) => {
   });
 });
 
-//route   POST /api/users/profile/cover
-export const uploadCoverImage = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    return errorResponse(res, 400, "Please upload an image");
-  }
-
-  const user = await User.findById(req.userId);
-
-  if (user.coverImage?.public_id) {
-    await deleteFromCloudinary(user.coverImage.public_id);
-  }
-
-  const uploadedCoverImage = await uploadToCloudinary(req.file.buffer, "event-management/covers");
-
-  user.coverImage = {
-    url: uploadedCoverImage.url,
-    public_id: uploadedCoverImage.public_id,
-  };
-
-  await user.save();
-
-  return successResponse(res, 200, "Cover image uploaded successfully", {
-    user: user.toJSON(),
-  });
-});
-
 //route   POST /api/users/:id/follow
 export const followUser = asyncHandler(async (req, res) => {
   const { id } = req.params;

@@ -38,10 +38,6 @@ const userSchema = new mongoose.Schema(
       url: String,
       public_id: String,
     },
-    coverImage: {
-      url: String,
-      public_id: String,
-    },
     bio: {
       type: String,
       maxlength: 300,
@@ -170,10 +166,10 @@ userSchema.pre("save", async function () {
 });
 
 // Method to compare passwords
-userSchema.methods.comparePassword = async function (enteredPassword) {
-  const bcrypt = await import("bcryptjs");
-  return await bcrypt.default.compare(enteredPassword, this.password);
+const isMatch = userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
+
 
 // Method to hide sensitive fields
 userSchema.methods.toJSON = function () {
