@@ -1,36 +1,42 @@
-import axios from "axios";
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true, // sends cookies automatically
-  timeout: 10000,
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
+// Request Interceptor
+api.interceptors.request.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
+
+// Response Interceptor
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  (error) => {
     const originalRequest = error.config;
-    const url = originalRequest?.url || "";
 
-    const isAuthRoute =
-      url.includes("/auth/login") ||
-      url.includes("/auth/register") ||
-      url.includes("/auth/forgot-password");
+    if (!error.response) {
+      return Promise.reject({ message: "Network error" });
+    }
 
+    // ✅ IMPORTANT: ignore /auth/me failure
     if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !isAuthRoute
+      error.response.status === 401 &&
+      originalRequest.url.includes("/auth/me")
     ) {
-      originalRequest._retry = true;
+      return Promise.reject(error);
+    }
 
-      try {
-        await api.post("/auth/refresh");
-        return api(originalRequest);
-      } catch (refreshError) {
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
-      }
+    // ✅ Handle other 401 (real unauthorized)
+    if (error.response.status === 401) {
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

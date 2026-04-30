@@ -9,18 +9,48 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import UserDashboardPage from "./pages/Dashboard/UserDashboardPage";
 import DashboardLayout from "./components/Layout/DashboardLayout";
 import ProfilePage from "./pages/Profile/ProfilePage";
+import Spinner from "./components/ui/Spinner";
 
 function App() {
   const dispatch = useDispatch();
+  const { isAuthChecked, isLoggedIn } = useSelector((state) => state?.auth);
+
+  // 🔥 Run once on app load
   useEffect(() => {
-    dispatch(fetchProfile());
-  }, [dispatch]);
+    if (!isAuthChecked) {
+      dispatch(fetchProfile());
+    }
+  }, [dispatch, isAuthChecked]);
+
+  // 🔥 Block UI until auth is verified
+  if (!isAuthChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // 🔐 Private Route
+  const PrivateRoute = ({ children }) => {
+    return isLoggedIn ? children : <Navigate to="/login" replace />;
+  };
+
+  // 🚫 Public Route (block logged-in users from login/register)
+  const PublicRoute = ({ children }) => {
+    return isLoggedIn ? <Navigate to="/user-dashboard" replace /> : children;
+  };
+
   return (
     <Router>
       <Toaster
         position="top-right"
         reverseOrder={false}
         gutter={8}
+        containerStyle={{
+          top: "80px",
+          right: "20px",
+        }}
         toastOptions={{
           duration: 3000,
           style: {
@@ -46,22 +76,60 @@ function App() {
       />
 
       <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* 🚫 Public Routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
 
-        {/* Dashboard Routes */}
-        <Route path="/user-dashboard" element={<DashboardLayout />}>
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+
+        {/* 🔐 Protected Routes */}
+        <Route
+          path="/user-dashboard"
+          element={
+            <PrivateRoute>
+              <DashboardLayout />
+            </PrivateRoute>
+          }
+        >
           <Route index element={<UserDashboardPage />} />
         </Route>
 
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
 
-        {/* Default Redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* 🔁 Default Route */}
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/user-dashboard" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
-        {/* Catch All */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* ❌ Catch All */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

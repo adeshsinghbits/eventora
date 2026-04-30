@@ -40,9 +40,9 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       await dispatch(login(data)).unwrap();
-      await dispatch(fetchProfile());
+      dispatch(fetchProfile());
       reset();
-      navigate('/user-dashboard');
+      navigate('/user-dashboard', { replace: true });
     } catch (error) {
       toast.error('Login failed. Please try again.');
     } finally {

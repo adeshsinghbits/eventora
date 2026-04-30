@@ -2,9 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { register, login, logout, fetchProfile, changeUserPassword, forgotUserPassword } from "./authThunks";
 
 const initialState = {
-    user: null,
-    loading: false,
-    error: null,
+  user: null,
+  loading: false,
+  error: null,
+  isAuthChecked: false,
+  isLoggedIn: false, 
 };
 
 const authSlice = createSlice({
@@ -24,7 +26,6 @@ const authSlice = createSlice({
             .addCase(register.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error("Registration failed");
             });
         builder
             .addCase(login.pending, (state) => {
@@ -34,11 +35,11 @@ const authSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isLoggedIn = true;
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error("Login failed");
             });
         builder
             .addCase(logout.pending, (state) => {
@@ -48,25 +49,27 @@ const authSlice = createSlice({
             .addCase(logout.fulfilled, (state) => {
                 state.loading = false;
                 state.user = null;
+                state.isLoggedIn = false;
             })
             .addCase(logout.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error("Logout failed");
             });
         builder
             .addCase(fetchProfile.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(fetchProfile.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isAuthChecked = true;
+                state.isLoggedIn = true;
             })
-            .addCase(fetchProfile.rejected, (state, action) => {
+            .addCase(fetchProfile.rejected, (state) => {
                 state.loading = false;
-                state.error = action.payload;
-                toast.error("Failed to fetch profile");
+                state.user = null;
+                state.isAuthChecked = true;
+                state.isLoggedIn = false;
             });
         builder
             .addCase(changeUserPassword.pending, (state) => {
@@ -75,12 +78,10 @@ const authSlice = createSlice({
             })
             .addCase(changeUserPassword.fulfilled, (state) => {
                 state.loading = false;
-                toast.success("Password changed successfully");
             })
             .addCase(changeUserPassword.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
-                toast.error("Failed to change password");
+                state.error = action.payload
             });
         builder
             .addCase(forgotUserPassword.pending, (state) => {
@@ -89,12 +90,10 @@ const authSlice = createSlice({
             })
             .addCase(forgotUserPassword.fulfilled, (state) => {
                 state.loading = false;
-                toast.success("Password reset link sent successfully");
             })
             .addCase(forgotUserPassword.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error("Failed to send password reset link");
             });
     },
 });

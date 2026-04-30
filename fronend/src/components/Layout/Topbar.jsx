@@ -1,5 +1,5 @@
 // Topbar.jsx
-import { useState } from "react";
+import { use, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,11 +18,12 @@ import {
   openMobileSidebar,
   toggleTheme,
 } from "../../features/ui/uiSlice";
+import { logout } from "../../features/auth/authThunks"
 
 export default function Topbar() {
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
-
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.auth?.user);
   const { sidebarOpen } = useSelector((state) => state.ui);
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -51,6 +52,7 @@ export default function Topbar() {
   ];
 
   const handleLogout = () => {
+    dispatch(logout());
     navigate("/login");
   };
 
@@ -147,7 +149,7 @@ export default function Topbar() {
             className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
           >
             <img
-              src={AvatarLogo || user.avatar}
+              src={user?.avatarUrl || AvatarLogo}
               alt="user"
               className="w-9 h-9 rounded-full object-cover"
             />
@@ -174,10 +176,10 @@ export default function Topbar() {
               >
                 <div className="p-4 border-b border-gray-200 dark:border-slate-700">
                   <p className="font-semibold text-sm dark:text-white">
-                    {user.fullName}
+                    {user?.fullName || "Guest"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {user.email}
+                    {user?.email || "guest@gmail.com"}
                   </p>
                 </div>
 

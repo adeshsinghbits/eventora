@@ -70,7 +70,7 @@ export const register = asyncHandler(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false,
     sameSite: "strict",
     maxAge: parseInt(process.env.COOKIE_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
   };
@@ -127,7 +127,7 @@ export const login = asyncHandler(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false,
     sameSite: "strict",
     maxAge: parseInt(process.env.COOKIE_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
   };
@@ -167,9 +167,9 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 30 * 60 * 1000, 
     });
 
     return successResponse(res, 200, "Access token refreshed", {

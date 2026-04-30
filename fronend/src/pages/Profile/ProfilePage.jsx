@@ -1,201 +1,341 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { FiAlertCircle } from 'react-icons/fi';
 import {
-  FiMail,
-  FiUser,
-  FiMapPin,
-  FiShield,
-  FiAward,
-  FiUsers,
-  FiCalendar,
-  FiStar,
-  FiEdit,
-} from "react-icons/fi";
-import { useSelector } from "react-redux";
-import Spinner from "../../components/ui/Spinner";
+  updateProfile,
+  uploadAvatar,
+  getFollowers,
+  getFollowing,
+  clearError,
+  clearSuccess,
+} from '../../features/proflie/profileSlice';
+import { fetchProfile } from '../../features/auth/authThunks';
+import ProfileHeader from '../../components/profile/ProflieHader';
+import ProfileTabs from '../../components/profile/ProfileTabs';
+import EditProfileModal from '../../components/profile/EditProfileModel';
+import { MOCK_EVENTS } from '../../constants/mockData';
 
-export default function ProfilePage() {
-  const { user } = useSelector((state) => state.auth);
+const ProfilePage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { username } = useParams();
 
-  if (!user) {
-    return (
-      <Spinner />
-    );
+  // Redux selectors
+  const {
+    followers,
+    following,
+    loading,
+    uploading,
+    error,
+    success,
+  } = useSelector((state) => state.profile);
+  const { user, isLoggedIn } = useSelector((state) => state.auth);
+
+  console.log(isLoggedIn);
+  
+
+  // Local state
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  // Determine if viewing own profile
+  const isOwnProfile = useMemo(() => !username, [username]);
+
+  useEffect(() => {
+    if (!user?._id || !isOwnProfile) return;
+
+    dispatch(getFollowers(user._id));
+    dispatch(getFollowing(user._id));
+  }, [user?._id, isOwnProfile, dispatch]);
+
+  useEffect(() => {
+    if (!success) return;
+
+    setShowSuccessMessage(true);
+    const timer = setTimeout(() => {
+      setShowSuccessMessage(false);
+      dispatch(clearSuccess());
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [success, dispatch]);
+
+  useEffect(() => {
+    if (!error) return;
+
+    const timer = setTimeout(() => {
+      dispatch(clearError());
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [error, dispatch]);
+
+  const handleEditClick = useCallback(() => {
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleEditModalClose = useCallback(() => {
+    setIsEditModalOpen(false);
+  }, []);
+
+  const handleSaveProfile = useCallback(async (formData) => {
+    const result = await dispatch(updateProfile(formData));
+    // Only close modal on success
+    if (!result.payload?.error) {
+      setIsEditModalOpen(false);
+    }
+  }, [dispatch]);
+
+  const handleAvatarChange = useCallback(async (file) => {
+    await dispatch(uploadAvatar(file));
+  }, [dispatch]);
+
+  const handleTabChange = useCallback((tabId) => {
+    setActiveTab(tabId);
+  }, []);
+  
+  // ============ MEMOIZED EVENT DATA ============
+  const eventData = useMemo(() => ({
+    created: MOCK_EVENTS.CREATED,
+    attending: MOCK_EVENTS.ATTENDING,
+    saved: MOCK_EVENTS.SAVED,
+  }), []);
+
+  if (loading && !user) {
+    return <ProfilePageSkeleton />;
   }
 
-  const joinDate = new Date(user.createdAt).toLocaleDateString();
+  if (!isLoggedIn) {
+    return <UnauthenticatedState navigate={navigate} />;
+  }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 md:p-10">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl bg-gradient-to-r from-purple-700 to-indigo-700 p-8 shadow-2xl"
-        >
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Avatar */}
-            <div className="w-28 h-28 rounded-full bg-white/20 flex items-center justify-center text-5xl font-bold uppercase">
-              {user.fullName?.charAt(0)}
-            </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4 sm:px-6 lg:px-8"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Error Message - Dismissible */}
+        <ErrorAlert error={error} />
 
-            {/* Info */}
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-4xl font-bold">{user.fullName}</h1>
-              <p className="text-lg text-white/80">@{user.username}</p>
+        {/* Success Message */}
+        <SuccessAlert show={showSuccessMessage} />
 
-              <div className="mt-3 flex flex-wrap gap-3 justify-center md:justify-start">
-                <span className="px-3 py-1 bg-white/10 rounded-full text-sm">
-                  {user.role}
-                </span>
+        {/* Main Content */}
+        {user ? (
+          <>
+            {/* Profile Header */}
+            <ProfileHeader
+              user={user}
+              onEditClick={handleEditClick}
+              onAvatarChange={handleAvatarChange}
+              isOwnProfile={isOwnProfile}
+            />
 
-                {user.isVerified && (
-                  <span className="px-3 py-1 bg-green-500 rounded-full text-sm">
-                    Verified
-                  </span>
-                )}
-
-                {user.isBlocked && (
-                  <span className="px-3 py-1 bg-red-500 rounded-full text-sm">
-                    Blocked
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Edit Button */}
-            <button className="px-5 py-3 rounded-xl bg-white text-black font-semibold flex items-center gap-2 hover:scale-105 transition">
-              <FiEdit />
-              Edit Profile
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* About */}
+            {/* Profile Tabs */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-slate-900 rounded-2xl p-6 border border-slate-800"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-8"
             >
-              <h2 className="text-2xl font-bold mb-4">About</h2>
-              <p className="text-slate-300">
-                {user.bio || "No bio added yet."}
-              </p>
-
-              <div className="grid md:grid-cols-2 gap-4 mt-6 text-sm">
-                <div className="flex items-center gap-3">
-                  <FiMail />
-                  {user.email}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <FiCalendar />
-                  Joined {joinDate}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <FiShield />
-                  Email Verified: {user.emailVerified ? "Yes" : "No"}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <FiMapPin />
-                  {user.location?.type || "No location"}
-                </div>
-              </div>
+              <ProfileTabs
+                user={user}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                createdEvents={eventData.created}
+                attendingEvents={eventData.attending}
+                savedEvents={eventData.saved}
+                followers={followers}
+                following={following}
+              />
             </motion.div>
+          </>
+        ) : (
+          <EmptyProfileState navigate={navigate} />
+        )}
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                {
-                  title: "Followers",
-                  value: user.followers?.length || 0,
-                  icon: <FiUsers />,
-                },
-                {
-                  title: "Following",
-                  value: user.following?.length || 0,
-                  icon: <FiUsers />,
-                },
-                {
-                  title: "Events",
-                  value: user.createdEvents?.length || 0,
-                  icon: <FiCalendar />,
-                },
-                {
-                  title: "Points",
-                  value: user.points || 0,
-                  icon: <FiStar />,
-                },
-              ].map((item, i) => (
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  key={i}
-                  className="bg-slate-900 rounded-2xl p-5 border border-slate-800"
-                >
-                  <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="text-2xl font-bold">{item.value}</p>
-                  <p className="text-slate-400 text-sm">{item.title}</p>
-                </motion.div>
-              ))}
-            </div>
+        {/* Edit Profile Modal */}
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+          user={user}
+          onSave={handleSaveProfile}
+          isLoading={loading || uploading}
+        />
+      </div>
+    </motion.div>
+  );
+};
+
+/**
+ * ErrorAlert - Reusable error notification component
+ */
+const ErrorAlert = ({ error }) => {
+  if (!error) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="mb-6 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-xl flex items-center gap-3"
+      role="alert"
+      aria-live="polite"
+    >
+      <FiAlertCircle 
+        className="text-red-600 dark:text-red-400 flex-shrink-0" 
+        size={20} 
+        aria-hidden="true"
+      />
+      <div>
+        <p className="font-semibold text-red-800 dark:text-red-200">
+          Error
+        </p>
+        <p className="text-sm text-red-700 dark:text-red-300">
+          {error}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+/**
+ * SuccessAlert - Reusable success notification component
+ */
+const SuccessAlert = ({ show }) => {
+  if (!show) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="mb-6 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-xl flex items-center gap-3"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="w-5 h-5 rounded-full bg-green-600 dark:bg-green-400 flex items-center justify-center flex-shrink-0">
+        <span className="text-white text-sm font-bold">✓</span>
+      </div>
+      <p className="font-semibold text-green-800 dark:text-green-200">
+        Profile updated successfully!
+      </p>
+    </motion.div>
+  );
+};
+
+/**
+ * UnauthenticatedState - Show when user is not authenticated
+ */
+const UnauthenticatedState = ({ navigate }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800"
+  >
+    <div className="text-center py-20">
+      <div className="text-6xl mb-4">🔐</div>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        Authentication Required
+      </h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        Please log in to view your profile.
+      </p>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate('/login')}
+        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow"
+      >
+        Go to Login
+      </motion.button>
+    </div>
+  </motion.div>
+);
+
+/**
+ * Skeleton Loader for loading state
+ * Prevents layout shift and improves perceived performance
+ */
+const ProfilePageSkeleton = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Header Skeleton */}
+      <motion.div
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="space-y-4"
+      >
+        <div className="h-48 md:h-64 bg-gray-300 dark:bg-gray-700 rounded-2xl" />
+        <div className="flex gap-6">
+          <div className="w-32 h-32 bg-gray-300 dark:bg-gray-700 rounded-2xl -mt-16 flex-shrink-0" />
+          <div className="flex-1 space-y-3">
+            <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded-lg w-2/3" />
+            <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded-lg w-1/3" />
+            <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded-lg w-1/2" />
           </div>
+        </div>
+      </motion.div>
 
-          {/* Right Section */}
-          <div className="space-y-6">
-            {/* Reputation */}
-            <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-              <h2 className="text-xl font-bold mb-4">Reputation</h2>
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
+            className="h-24 bg-gray-300 dark:bg-gray-700 rounded-xl"
+          />
+        ))}
+      </div>
 
-              <div className="space-y-3 text-sm">
-                <p className="flex justify-between">
-                  <span>Login Count</span>
-                  <span>{user.loginCount}</span>
-                </p>
-
-                <p className="flex justify-between">
-                  <span>Unread Notifications</span>
-                  <span>{user.unreadNotifications}</span>
-                </p>
-
-                <p className="flex justify-between">
-                  <span>Reports</span>
-                  <span>{user.reportsCount}</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Badges */}
-            <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <FiAward />
-                Badges
-              </h2>
-
-              {user.badges?.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {user.badges.map((badge, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 rounded-full bg-purple-600 text-sm"
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-400">No badges yet</p>
-              )}
-            </div>
-          </div>
+      {/* Tabs Skeleton */}
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded-lg w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="h-40 bg-gray-300 dark:bg-gray-700 rounded-xl"
+            />
+          ))}
         </div>
       </div>
     </div>
-  );
-}
+  </div>
+);
+
+/**
+ * EmptyProfileState - Show when profile is not found
+ */
+const EmptyProfileState = ({ navigate }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-center py-20"
+  >
+    <div className="text-6xl mb-4">👤</div>
+    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      Profile Not Found
+    </h2>
+    <p className="text-gray-600 dark:text-gray-400 mb-6">
+      The user profile you're looking for doesn't exist or has been removed.
+    </p>
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => navigate(-1)}
+      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow"
+    >
+      Go Back
+    </motion.button>
+  </motion.div>
+);
+
+export default ProfilePage;
