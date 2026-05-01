@@ -10,6 +10,8 @@ import connectDB from "./config/database.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import geocodeRoutes from "./routes/geocodeRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -52,6 +54,8 @@ app.use((req, res, next) => {
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/geocode", geocodeRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
