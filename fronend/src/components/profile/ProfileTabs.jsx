@@ -8,14 +8,6 @@ import {
   FiSettings,
 } from 'react-icons/fi';
 
-/**
- * ProfileTabs - Memoized tabs component
- * 
- * Optimizations:
- * - Memoized tabs array to prevent recalculation
- * - Separated tab content components for better code splitting
- * - Optimized conditional rendering
- */
 const ProfileTabs = React.memo(({
   user,
   activeTab,
@@ -83,13 +75,13 @@ const ProfileTabs = React.memo(({
       transition={{ delay: 0.3 }}
     >
       {/* Tab Navigation */}
-      <div className="mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+      <div className="mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-custom">
         <div className="flex gap-1" role="tablist" aria-label="Profile sections">
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`relative px-4 py-4 text-sm font-semibold whitespace-nowrap flex items-center gap-2 transition-colors ${
+              className={`relative px-4 py-4 text-sm font-semibold whitespace-nowrap cursor-pointer flex items-center gap-2 transition-colors ${
                 activeTab === tab.id
                   ? 'text-gray-900 dark:text-white'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -243,7 +235,7 @@ const OverviewTab = React.memo(({ user }) => (
             <motion.span
               key={interest}
               whileHover={{ y: -2 }}
-              className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold"
+              className="px-4 py-2  text-white dark:bg-purple-700 rounded-full text-sm font-semibold"
             >
               {interest}
             </motion.span>

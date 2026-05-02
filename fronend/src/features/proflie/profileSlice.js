@@ -1,14 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { updateUserProfileService, uploadAvatarService, followUserService, unfollowUserService, getUserFollowersService, getUserFollowingService,  } from '../../services/userService';
-
+import { toast } from 'react-hot-toast';
 
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
       const { data } = await updateUserProfileService(profileData);
+      toast.success( data?.message || 'Profile updated successfully');
       return data;
     } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update profile');
       return rejectWithValue(error.response?.data?.message || 'Failed to update profile');
     }
   }
@@ -19,8 +21,10 @@ export const uploadAvatar = createAsyncThunk(
   async (file, { rejectWithValue }) => {
     try {
         const { data } = await uploadAvatarService(file);
+        toast.success(data?.message || 'Avatar uploaded successfully');
         return data;
     } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to upload avatar');
         return rejectWithValue(error.response?.data?.message || 'Failed to upload avatar');
     }
   }

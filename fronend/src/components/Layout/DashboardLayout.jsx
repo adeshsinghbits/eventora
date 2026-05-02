@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
-export default function DashboardLayout() {
+export default function Layout() {
   const { sidebarOpen, theme } = useSelector((state) => state.ui);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function DashboardLayout() {
   }, [theme]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-950">
       <Sidebar />
       <Topbar />
 
@@ -24,7 +24,7 @@ export default function DashboardLayout() {
           sidebarOpen ? "lg:ml-72" : "lg:ml-24"
         }`}
       >
-        <main className="pt-20 p-6">
+        <main className="pt-20 p-3">
           <Outlet />
         </main>
       </div>

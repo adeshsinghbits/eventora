@@ -27,10 +27,10 @@ export default function RecentEventCard({ event }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       whileHover={{ y: -4 }}
-      className="group overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300"
+      className="group overflow-hidden rounded-2xl bg-slate-800 border border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300"
     >
       {/* Image Container */}
-      <div className="relative overflow-hidden h-48 bg-gray-100 dark:bg-slate-700">
+      <div className="relative overflow-hidden h-48 bg-slate-700">
         <motion.img
           src={event.image}
           alt={event.title}

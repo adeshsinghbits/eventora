@@ -1,1 +1,24 @@
 @import "tailwindcss";
+/* Custom scrollbar */
+.scrollbar-custom::-webkit-scrollbar, body::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track, body::-webkit-scrollbar {
+  background: #1f2937; 
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb, body::-webkit-scrollbar {
+  background: #3b82f6; 
+  border-radius: 1px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar {
+  background: #2563eb;
+}
+
+/* Firefox */
+.scrollbar-custom, body::-webkit-scrollbar{
+  scrollbar-width: none;
+  scrollbar-color: #3b82f6 #1f2937;
+}

@@ -4,14 +4,7 @@ import { FiMapPin, FiCamera, FiShare2 } from 'react-icons/fi';
 import { MdVerified, MdStar } from 'react-icons/md';
 import { formatDistanceToNow } from 'date-fns';
 
-/**
- * ProfileHeader - Memoized component to prevent unnecessary re-renders
- * 
- * Optimizations:
- * - Uses React.memo to prevent re-renders when props haven't changed
- * - Memoizes expensive calculations
- * - useCallback for event handlers to prevent child re-renders
- */
+
 const ProfileHeader = React.memo(({ 
   user, 
   onEditClick, 
@@ -19,11 +12,6 @@ const ProfileHeader = React.memo(({
   isOwnProfile 
 }) => {
   const fileInputRef = useRef(null);
-
-  // Memoize profile completion calculation
-  const profileCompletion = useMemo(() => {
-    return calculateProfileCompletion(user);
-  }, [user]);
 
   // Animation variants
   const containerVariants = {
@@ -41,8 +29,7 @@ const ProfileHeader = React.memo(({
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: 'easeOut' },
+      y: 20,
     },
   };
 
@@ -100,35 +87,10 @@ const ProfileHeader = React.memo(({
       animate="visible"
       className="relative z-10"
     >
-      {/* Cover Background */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-xl">
-        <div className="absolute inset-0 bg-gradient-overlay opacity-30"></div>
-
-        {/* Animated background elements */}
-        <motion.div
-          className="absolute top-10 right-20 w-40 h-40 bg-white rounded-full mix-blend-overlay opacity-10"
-          animate={{ y: [0, -20, 0] }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          aria-hidden="true"
-        />
-        <motion.div
-          className="absolute -bottom-10 -left-10 w-60 h-60 bg-white rounded-full mix-blend-overlay opacity-5"
-          animate={{ y: [0, 20, 0] }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          aria-hidden="true"
-        />
-      </div>
+      
 
       {/* Main Content */}
-      <div className="relative px-6 md:px-8 -mt-24 md:-mt-32">
+      <div className="relative px-6 pt-20 md:px-8 -mt-24 md:-mt-32">
         <motion.div
           variants={itemVariants}
           className="flex flex-col md:flex-row md:items-end gap-6"
@@ -201,7 +163,7 @@ const ProfileHeader = React.memo(({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onEditClick}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow"
+                className="px-6 py-3 bg-purple-700 text-white font-semibold rounded-xl cursor-pointer hover:shadow-lg transition-shadow"
                 aria-label="Edit profile"
               >
                 Edit Profile
@@ -210,7 +172,7 @@ const ProfileHeader = React.memo(({
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow"
+                className="px-6 py-3 bg-purple-700 text-white font-semibold rounded-xl cursor-pointer hover:shadow-lg transition-shadow"
                 aria-label="Follow user"
               >
                 Follow
@@ -219,7 +181,7 @@ const ProfileHeader = React.memo(({
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-3 border-2 text-white border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
               aria-label="Share profile"
             >
               <FiShare2 size={20} />
@@ -248,33 +210,10 @@ const ProfileHeader = React.memo(({
             icon={<MdStar className="text-yellow-500" />} 
           />
           <StatCard 
-            label="Reputation" 
-            value={`${profileCompletion}%`} 
+            label="Event Attends" 
+            value={`10`} 
             icon="⭐" 
           />
-        </motion.div>
-
-        {/* Profile Completion Bar */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-6"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Profile Completeness
-            </span>
-            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-              {profileCompletion}%
-            </span>
-          </div>
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${profileCompletion}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-            />
-          </div>
         </motion.div>
       </div>
     </motion.div>
@@ -301,9 +240,9 @@ const AvatarSection = React.memo(({
   fileInputRef,
   onFileSelect,
 }) => (
-  <div className="relative flex-shrink-0">
+  <div className="relative shrink-0">
     <motion.div
-      className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 cursor-pointer group"
+      className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl cursor-pointer group"
       whileHover={isOwnProfile ? { scale: 1.05 } : undefined}
       whileTap={isOwnProfile ? { scale: 0.95 } : undefined}
       onClick={onAvatarClick}
@@ -318,13 +257,13 @@ const AvatarSection = React.memo(({
       {user?.avatar?.url ? (
         <>
           <img
-            src={user.avatar.url}
+            src={user?.avatar?.url}
             alt={user.fullName}
             className="w-full h-full object-cover"
             loading="lazy"
           />
           {isOwnProfile && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+            <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
               <FiCamera 
                 className="text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity" 
                 aria-hidden="true"
@@ -333,7 +272,7 @@ const AvatarSection = React.memo(({
           )}
         </>
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500">
+        <div className="w-full h-full flex items-center justify-center bg-purple-700">
           <span className="text-4xl text-white font-bold">
             {user?.fullName?.charAt(0)?.toUpperCase()}
           </span>
@@ -385,36 +324,5 @@ const StatCard = React.memo(({ label, value, icon }) => (
 
 StatCard.displayName = 'StatCard';
 
-/**
- * Calculate profile completion percentage
- * Optimized: Uses early returns to skip unnecessary checks
- */
-function calculateProfileCompletion(user) {
-  if (!user) return 0;
-
-  const fields = [
-    'fullName',
-    'username',
-    'email',
-    'avatar',
-    'bio',
-    'phone',
-    'website',
-    'city',
-    'country',
-    'interests',
-  ];
-
-  const completed = fields.filter((field) => {
-    const value = user[field];
-    
-    // Early returns for different value types
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'object') return value && Object.keys(value).length > 0;
-    return value && String(value).trim().length > 0;
-  }).length;
-
-  return Math.round((completed / fields.length) * 100);
-}
 
 export default ProfileHeader;

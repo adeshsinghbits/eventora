@@ -39,12 +39,15 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      await dispatch(login(data)).unwrap();
-      dispatch(fetchProfile());
+      const result = await dispatch(login(data)).unwrap();
+      if (result.success) {
+        dispatch(fetchProfile());
+        navigate('/user-dashboard', { replace: true });
+      }
       reset();
-      navigate('/user-dashboard', { replace: true });
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      console.log(error);
+      toast.error(error.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +74,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-gray-300 via-gray-600 to-gray-900 flex items-center justify-center p-4">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>

@@ -23,6 +23,8 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 
+import { FaUser } from "react-icons/fa"
+
 import {
   toggleSidebar,
   closeMobileSidebar,
@@ -44,16 +46,14 @@ export default function Sidebar() {
 
   const navItems = [
     { id: 1, label: "Dashboard", icon: FiHome, path: "/user-dashboard" },
-    { id: 2, label: "Explore Events", icon: FiCompass, path: "/explore" },
-    { id: 3, label: "My Events", icon: FiCalendar, path: "/my-events" },
-    { id: 4, label: "Create Event", icon: FiPlus, path: "/create-event" },
-    { id: 5, label: "Saved Events", icon: FiBookmark, path: "/saved-events" },
-    { id: 6, label: "Attending", icon: FiCheck, path: "/attending" },
-    { id: 7, label: "Notifications", icon: FiBell, path: "/notifications" },
-    { id: 8, label: "Messages", icon: FiMessageSquare, path: "/messages" },
-    { id: 9, label: "Analytics", icon: FiBarChart, path: "/analytics" },
-    { id: 10, label: "Settings", icon: FiSettings, path: "/settings" },
-    { id: 11, label: "Help", icon: FiHelpCircle, path: "/help" },
+    { id: 2, label: "Profile", icon: FaUser, path: "/profile" },
+    { id: 3, label: "Explore Events", icon: FiCompass, path: "/explore-events" },
+    { id: 4, label: "My Events", icon: FiCalendar, path: "/my-events" },
+    { id: 5, label: "Create Event", icon: FiPlus, path: "/create-event" },
+    { id: 8, label: "Notifications", icon: FiBell, path: "/notifications" },
+    { id: 9, label: "Messages", icon: FiMessageSquare, path: "/messages" },
+    { id: 11, label: "Settings", icon: FiSettings, path: "/settings" },
+    { id: 12, label: "Help", icon: FiHelpCircle, path: "/help" },
   ];
 
   const handleLogout = () => {
@@ -68,7 +68,7 @@ export default function Sidebar() {
         ${
           sidebarOpen ? "w-72" : "w-24"
         }
-        bg-slate-900 border-r border-slate-800`}
+        bg-slate-900 `}
       >
         {/* Header */}
         <div className="h-20 px-5 border-b border-slate-800 flex items-center justify-between">
@@ -91,7 +91,7 @@ export default function Sidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-visible">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-custom">
           {navItems.map((item) => {
             const Icon = item.icon;
 
@@ -146,7 +146,7 @@ export default function Sidebar() {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ duration: 0.3 }}
-              className="fixed top-0 left-0 h-screen w-72 z-50 flex flex-col bg-white dark:bg-slate-900 lg:hidden"
+              className="fixed top-0 left-0 h-screen w-72 z-50 flex flex-col bg-slate-900 lg:hidden"
             >
               <div className="h-20 px-5 border-b flex items-center justify-between">
                 <h1 className="text-2xl font-bold">
@@ -155,13 +155,13 @@ export default function Sidebar() {
 
                 <button
                   onClick={() => dispatch(closeMobileSidebar())}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
+                  className="p-2 rounded-lg hover:bg-gray-100"
                 >
                   <FiX size={20} />
                 </button>
               </div>
 
-              <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+              <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-custom">
                 {navItems.map((item) => {
                   const Icon = item.icon;
 
@@ -174,8 +174,8 @@ export default function Sidebar() {
                         `flex items-center gap-4 px-4 py-3 rounded-xl
                         ${
                           isActive
-                            ? "bg-purple-100 text-purple-700"
-                            : "hover:bg-gray-100 dark:hover:bg-slate-800"
+                            ? "bg-purple-600 text-black"
+                            : "hover:bg-gray-800 text-white"
                         }`
                       }
                     >
@@ -186,14 +186,6 @@ export default function Sidebar() {
                 })}
               </nav>
 
-              <div className="p-4 border-t">
-                <button
-                  onClick={handleLogout}
-                  className="w-full py-3 rounded-xl bg-red-500 text-white"
-                >
-                  Logout
-                </button>
-              </div>
             </motion.aside>
           </>
         )}

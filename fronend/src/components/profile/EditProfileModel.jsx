@@ -123,7 +123,7 @@ const EditProfileModal = ({ isOpen, onClose, user, onSave, isLoading }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm "
           />
 
           {/* Modal */}
@@ -132,7 +132,7 @@ const EditProfileModal = ({ isOpen, onClose, user, onSave, isLoading }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl z-50 overflow-y-auto"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl z-50 overflow-y-auto scrollbar-custom"
           >
             {/* Header */}
             <div className="sticky top-0 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-10">

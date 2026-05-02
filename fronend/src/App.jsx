@@ -4,12 +4,16 @@ import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "./features/auth/authThunks";
 
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute"
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import UserDashboardPage from "./pages/Dashboard/UserDashboardPage";
-import DashboardLayout from "./components/Layout/DashboardLayout";
+import Layout from "./components/Layout/DashboardLayout";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import Spinner from "./components/ui/Spinner";
+import CreateEvnetPage from "./pages/Event/CrateEventPage";
+import ExploreEventsPage from "./pages/Event/ExploreEventPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,16 +34,6 @@ function App() {
       </div>
     );
   }
-
-  // 🔐 Private Route
-  const PrivateRoute = ({ children }) => {
-    return isLoggedIn ? children : <Navigate to="/login" replace />;
-  };
-
-  // 🚫 Public Route (block logged-in users from login/register)
-  const PublicRoute = ({ children }) => {
-    return isLoggedIn ? <Navigate to="/user-dashboard" replace /> : children;
-  };
 
   return (
     <Router>
@@ -100,7 +94,7 @@ function App() {
           path="/user-dashboard"
           element={
             <PrivateRoute>
-              <DashboardLayout />
+              <Layout />
             </PrivateRoute>
           }
         >
@@ -111,10 +105,35 @@ function App() {
           path="/profile"
           element={
             <PrivateRoute>
-              <ProfilePage />
+              <Layout />
             </PrivateRoute>
           }
-        />
+        >
+          <Route index element={<ProfilePage />} />
+          <Route path=":username" element={<ProfilePage />} />
+        </Route>
+
+        <Route
+          path="/create-event"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<CreateEvnetPage />} />
+        </Route>
+
+         <Route
+          path="/explore-events"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<ExploreEventsPage />} />
+        </Route>
 
         {/* 🔁 Default Route */}
         <Route

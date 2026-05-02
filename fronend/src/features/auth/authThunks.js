@@ -19,7 +19,7 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
         toast.success("Login successful!");
         return response;
     } catch (error) {
-        toast.error(error.response.data.message || error.response.data || "Login failed.");
+        toast.error(error.response.data.message || error.response.data || "login failed.");
         return rejectWithValue(error.response.data);
     }
 });
@@ -39,9 +39,6 @@ export const fetchProfile = createAsyncThunk('auth/fetchProfile', async (_, { re
         const response = await getProfile();
         return response.data.user;
     } catch (error) {
-        toast.error(error.response.data.message || error.response.data || "Failed to fetch profile.");
-        console.log(error);
-        
         return rejectWithValue(error.response.data);
     }
 });

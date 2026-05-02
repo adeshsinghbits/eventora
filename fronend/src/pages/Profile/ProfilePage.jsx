@@ -117,27 +117,18 @@ const ProfilePage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-6xl mx-auto">
-        {/* Error Message - Dismissible */}
-        <ErrorAlert error={error} />
-
-        {/* Success Message */}
-        <SuccessAlert show={showSuccessMessage} />
-
         {/* Main Content */}
         {user ? (
           <>
-            {/* Profile Header */}
             <ProfileHeader
               user={user}
               onEditClick={handleEditClick}
               onAvatarChange={handleAvatarChange}
               isOwnProfile={isOwnProfile}
             />
-
-            {/* Profile Tabs */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -173,66 +164,6 @@ const ProfilePage = () => {
   );
 };
 
-/**
- * ErrorAlert - Reusable error notification component
- */
-const ErrorAlert = ({ error }) => {
-  if (!error) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="mb-6 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-xl flex items-center gap-3"
-      role="alert"
-      aria-live="polite"
-    >
-      <FiAlertCircle 
-        className="text-red-600 dark:text-red-400 flex-shrink-0" 
-        size={20} 
-        aria-hidden="true"
-      />
-      <div>
-        <p className="font-semibold text-red-800 dark:text-red-200">
-          Error
-        </p>
-        <p className="text-sm text-red-700 dark:text-red-300">
-          {error}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
-/**
- * SuccessAlert - Reusable success notification component
- */
-const SuccessAlert = ({ show }) => {
-  if (!show) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="mb-6 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-xl flex items-center gap-3"
-      role="status"
-      aria-live="polite"
-    >
-      <div className="w-5 h-5 rounded-full bg-green-600 dark:bg-green-400 flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-sm font-bold">✓</span>
-      </div>
-      <p className="font-semibold text-green-800 dark:text-green-200">
-        Profile updated successfully!
-      </p>
-    </motion.div>
-  );
-};
-
-/**
- * UnauthenticatedState - Show when user is not authenticated
- */
 const UnauthenticatedState = ({ navigate }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -259,10 +190,6 @@ const UnauthenticatedState = ({ navigate }) => (
   </motion.div>
 );
 
-/**
- * Skeleton Loader for loading state
- * Prevents layout shift and improves perceived performance
- */
 const ProfilePageSkeleton = () => (
   <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-8 px-4">
     <div className="max-w-6xl mx-auto space-y-8">
@@ -311,9 +238,6 @@ const ProfilePageSkeleton = () => (
   </div>
 );
 
-/**
- * EmptyProfileState - Show when profile is not found
- */
 const EmptyProfileState = ({ navigate }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
