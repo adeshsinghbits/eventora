@@ -30,6 +30,9 @@ export const createEvent = asyncHandler(async (req, res) => {
 
 // ── UPLOAD BANNER ─────────────────────────────────────────────────────────────
 export const uploadBanner = asyncHandler(async (req, res) => {
+  console.log("HEADERS:", req.headers["content-type"]);
+  console.log("FILE:", req.file);
+  console.log("BODY:", req.body);
   if (!req.file) {
     return res.status(400).json({ success: false, message: "No file received" });
   }

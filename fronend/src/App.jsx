@@ -14,6 +14,7 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 import Spinner from "./components/ui/Spinner";
 import CreateEvnetPage from "./pages/Event/CrateEventPage";
 import ExploreEventsPage from "./pages/Event/ExploreEventPage";
+import EventDetailPage from "./pages/Event/EventDetailPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -134,6 +135,17 @@ function App() {
         >
           <Route index element={<ExploreEventsPage />} />
         </Route>
+
+      <Route
+        path="/explore-events"
+        element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }
+      >
+        <Route path=":id" element={<EventDetailPage />} />
+      </Route>
 
         {/* 🔁 Default Route */}
         <Route

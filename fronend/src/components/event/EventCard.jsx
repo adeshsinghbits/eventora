@@ -101,7 +101,7 @@ const EventCard = ({ event, isSaved = false, className = "" }) => {
 
   return (
     <Link
-      to={`/events/${slug || _id}`}
+      to={`/explore-events/${slug}-${_id}`}
       className={`group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col ${className}`}
     >
       {/* Banner */}

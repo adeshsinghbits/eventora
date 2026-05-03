@@ -138,7 +138,7 @@ const MapView = ({ userLocation, flyTo, filters = {}, onEventClick }) => {
   const showClusters = clusteredEvents.length > 0;
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-md border border-gray-200">
+    <div className="relative w-full h-full z-0 rounded-2xl overflow-hidden shadow-md border border-gray-200">
       {/* Loading overlay */}
       {mapLoading && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-xs text-gray-600 shadow flex items-center gap-2">

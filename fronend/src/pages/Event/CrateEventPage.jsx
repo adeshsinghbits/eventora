@@ -202,19 +202,17 @@ export default function CreateEventPage() {
 
     try {
       let bannerResult = null;
-
+      
       if (bannerImage) {
-        const uploaded = await dispatch(uploadEventBanner(bannerImage)).unwrap();
-        bannerResult = {
-          public_id: uploaded.public_id,
-          url: uploaded.url,
-        };
-      } else {
-        bannerResult = {
-          public_id: "placeholder",
-          url: "https://via.placeholder.com/400x200?text=Event+Banner",
-        };
-      }
+      const uploaded = await dispatch(
+        uploadEventBanner({ file: bannerImage })
+      ).unwrap();
+
+      bannerResult = {
+        public_id: uploaded.public_id,
+        url: uploaded.url,
+      };
+    }
 
       const payload = {
         title: formData.title,

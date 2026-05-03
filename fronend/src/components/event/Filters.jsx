@@ -83,7 +83,7 @@ const Filters = ({ onChange, resultCount, loading }) => {
     filters.search !== "";
 
   const panelContent = (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-">
       {/* Search */}
       <div>
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
@@ -273,7 +273,7 @@ const Filters = ({ onChange, resultCount, loading }) => {
       {open && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="relative w-80 max-w-full bg-white h-full overflow-y-auto p-5 shadow-2xl">
+          <div className="relative w-80 max-w-full bg-white h-full  overflow-y-auto scrollbar-custom p-5 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-semibold text-gray-900">Filters</h2>
               <button onClick={() => setOpen(false)}>
@@ -292,8 +292,8 @@ const Filters = ({ onChange, resultCount, loading }) => {
       )}
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0">
-        <div className="sticky top-24 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm overflow-y-auto max-h-[calc(100vh-7rem)]">
+      <aside className="hidden lg:block w-56 xl:w-64 shrink-0 ">
+        <div className="sticky top-24 bg-white border overflow-y-auto scrollbar-custom border-gray-100 rounded-2xl p-5 shadow-sm overflow-y-auto max-h-[calc(100vh-7rem)]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-gray-900 text-sm">Filters</h2>
             {resultCount !== undefined && (
