@@ -15,6 +15,8 @@ import Spinner from "./components/ui/Spinner";
 import CreateEvnetPage from "./pages/Event/CrateEventPage";
 import ExploreEventsPage from "./pages/Event/ExploreEventPage";
 import EventDetailPage from "./pages/Event/EventDetailPage";
+import SettingsPage from "./pages/settings/SettingsPage";
+import HelpPage from "./pages/help/HelpPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -146,6 +148,29 @@ function App() {
       >
         <Route path=":id" element={<EventDetailPage />} />
       </Route>
+
+      <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<SettingsPage />} />
+        </Route>
+
+        <Route
+          path="/helpdesk"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<HelpPage />} />
+        </Route>
+
 
         {/* 🔁 Default Route */}
         <Route

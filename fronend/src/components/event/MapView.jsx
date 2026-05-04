@@ -195,7 +195,7 @@ const MapView = ({ userLocation, flyTo, filters = {}, onEventClick }) => {
                       {cluster.events.slice(0, 4).map((e) => (
                         <Link
                           key={e._id}
-                          to={`/events/${e.slug || e._id}`}
+                          to={`/explore-events/${e.slug}-${e._id}`}
                           className="flex gap-2 hover:bg-gray-50 rounded-lg p-1 transition-colors"
                           onClick={() => onEventClick?.(e)}
                         >

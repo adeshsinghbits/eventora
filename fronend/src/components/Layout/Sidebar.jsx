@@ -53,7 +53,7 @@ export default function Sidebar() {
     { id: 8, label: "Notifications", icon: FiBell, path: "/notifications" },
     { id: 9, label: "Messages", icon: FiMessageSquare, path: "/messages" },
     { id: 11, label: "Settings", icon: FiSettings, path: "/settings" },
-    { id: 12, label: "Help", icon: FiHelpCircle, path: "/help" },
+    { id: 12, label: "Help", icon: FiHelpCircle, path: "/helpdesk" },
   ];
 
   const handleLogout = () => {
