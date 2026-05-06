@@ -77,7 +77,7 @@ const EventRow = ({ event }) => {
           <img src={bannerImage.url} alt={title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <FiCalendar className="text-indigo-300" size={18} />
+            <FiCalendar className="text-purple-700" size={18} />
           </div>
         )}
       </div>
@@ -124,7 +124,7 @@ const EmptyState = ({ emoji, message, sub, action, onAction }) => (
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         onClick={onAction}
-        className="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+        className="inline-flex items-center gap-2 px-5 py-2 bg-purple-600 text-white text-sm font-medium rounded-xl hover:bg-purple-700 transition-colors"
       >
         <FiPlus size={15} />
         {action}
@@ -227,7 +227,7 @@ export default function UserDashboardPage() {
           <div>
             <p className="text-sm font-medium text-indigo-500 mb-1">Dashboard</p>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome back, <span className="text-indigo-600">{user.fullName ?? user.name}</span> 👋
+              Welcome back, <span className="text-indigo-600">{user.fullName ?? user.name}</span>
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md">
               {upcomingHosted.length > 0
@@ -250,7 +250,7 @@ export default function UserDashboardPage() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/create-event")}
-              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+              className="flex items-center gap-2 px-4 py-2.5 bg-purple-700 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
             >
               <FiPlus size={15} />
               Create Event
@@ -317,7 +317,6 @@ export default function UserDashboardPage() {
             </div>
           ) : (
             <EmptyState
-              emoji="📭"
               message="No Upcoming Events"
               sub="Create your first event to get started!"
               action="Create Event"
@@ -400,7 +399,7 @@ export default function UserDashboardPage() {
                         <img src={e.bannerImage.url} alt={e.title} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <FiCalendar className="text-indigo-300" size={14} />
+                          <FiCalendar className="text-purple-700" size={14} />
                         </div>
                       )}
                     </div>
@@ -419,7 +418,7 @@ export default function UserDashboardPage() {
                 message="Nothing yet"
                 sub="Browse events and RSVP to some!"
                 action="Explore"
-                onAction={() => navigate("/explore")}
+                onAction={() => navigate("/explore-events")}
               />
             )}
           </motion.div>

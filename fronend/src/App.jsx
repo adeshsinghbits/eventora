@@ -14,6 +14,8 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 import Spinner from "./components/ui/Spinner";
 import CreateEvnetPage from "./pages/Event/CrateEventPage";
 import ExploreEventsPage from "./pages/Event/ExploreEventPage";
+import MyEventsPage from "./pages/Event/MyEventsPage";
+import EditEventPage from "./pages/Event/EditEventPage";
 import EventDetailPage from "./pages/Event/EventDetailPage";
 import SettingsPage from "./pages/settings/SettingsPage";
 import HelpPage from "./pages/help/HelpPage";
@@ -136,6 +138,27 @@ function App() {
           }
         >
           <Route index element={<ExploreEventsPage />} />
+        </Route>
+
+        <Route
+          path="/my-events"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<MyEventsPage />} />
+        </Route>
+        <Route
+          path="/my-events"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+           <Route path=":id/edit" element={<EditEventPage />} />
         </Route>
 
       <Route

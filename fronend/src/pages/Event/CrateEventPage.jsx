@@ -139,6 +139,8 @@ export default function CreateEventPage() {
     country: "",
     postalCode: "",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    status: "draft",
+    visibility: "public",
   });
 
   const [location, setLocation] = useState(null);
@@ -235,6 +237,8 @@ export default function CreateEventPage() {
         country: formData.country,
         postalCode: formData.postalCode || "000000",
         ticketType: formData.isFree ? "free" : "paid",
+        status: formData.status,
+        visibility: formData.visibility,
         location: {
           type: "Point",
           coordinates: [location.lng, location.lat],
@@ -451,7 +455,32 @@ export default function CreateEventPage() {
                 className="w-full p-2 border rounded-lg"
               />
             </div>
-
+            <div>
+              <label className="block font-medium">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-lg"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label className="block font-medium">Visibility</label>
+              <select
+                name="visibility"
+                value={formData.visibility}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-lg"
+              >
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+                <option value="unlisted">Unlisted</option>
+              </select>
+            </div>
             <button
               onClick={handleSubmit}
               disabled={loading}

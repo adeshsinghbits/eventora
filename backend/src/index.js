@@ -12,6 +12,7 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import geocodeRoutes from "./routes/geocodeRoutes.js";
+import startEventStatusUpdater from "./cron/eventStatusUpdater.js";
 
 dotenv.config();
 const app = express();
@@ -89,6 +90,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const startServer = async () => {
   try {
     await connectDB();
+    startEventStatusUpdater();
 
     app.listen(PORT, () => {
       const timestamp = dayjs().format("YYYY-MM-DD HH:mm:ss");

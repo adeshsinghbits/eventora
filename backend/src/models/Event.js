@@ -245,7 +245,7 @@ const eventSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["draft", "pending", "published", "cancelled", "completed", "rejected"],
+        values: ["draft", "pending", "published", "ongoing", "cancelled", "completed", "rejected"],
         message: "Please select a valid status",
       },
       default: "draft",
@@ -338,6 +338,18 @@ eventSchema.virtual("fullAddress").get(function () {
   return [this.addressLine1, this.addressLine2, this.city, this.state, this.postalCode, this.country]
     .filter(Boolean)
     .join(", ");
+});
+
+eventSchema.virtual("dynamicStatus").get(function () {
+  const now = new Date();
+
+  if (this.status === "cancelled") return "cancelled";
+
+  if (now < this.startDate) return "upcoming";
+  if (now >= this.startDate && now <= this.endDate) return "ongoing";
+  if (now > this.endDate) return "completed";
+
+  return this.status;
 });
 
 // ── Pre-save ──────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { updateUserProfileService, uploadAvatarService, followUserService, unfollowUserService, getUserFollowersService, getUserFollowingService,  } from '../../services/userService';
+import { updateUserProfileService, uploadAvatarService, followUserService, unfollowUserService, getUserFollowersService, getUserFollowingService, searchUsersService, } from '../../services/userService';
 import { toast } from 'react-hot-toast';
 
 export const updateProfile = createAsyncThunk(
@@ -78,6 +78,18 @@ export const getFollowing = createAsyncThunk(
   }
 );
 
+export const searchUsers = createAsyncThunk(
+  'profile/searchUsers',
+  async (query, { rejectWithValue }) => {
+    try {
+      const { data } = await searchUsersService(query);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 const initialState = {
   followers: [],
   following: [],
@@ -85,6 +97,7 @@ const initialState = {
   uploading: false,
   error: null,
   success: false,
+  searchedUsers: [],
 };
 
 const profileSlice = createSlice({
@@ -173,6 +186,20 @@ const profileSlice = createSlice({
         state.following = action.payload;
       })
       .addCase(getFollowing.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Search Users
+    builder
+      .addCase(searchUsers.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.searchedUsers = action.payload;
+      })
+      .addCase(searchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

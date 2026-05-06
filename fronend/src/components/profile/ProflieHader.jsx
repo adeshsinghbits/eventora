@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiMapPin, FiCamera, FiShare2 } from 'react-icons/fi';
 import { MdVerified, MdStar } from 'react-icons/md';
 import { formatDistanceToNow } from 'date-fns';
-
+import { useDispatch } from 'react-redux';
 
 const ProfileHeader = React.memo(({ 
   user, 

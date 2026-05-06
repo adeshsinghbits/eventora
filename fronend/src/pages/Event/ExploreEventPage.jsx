@@ -111,12 +111,12 @@ const ExplorePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* ── Header ── */}
-      <header className="sticky top-20 z-30 bg-white border-b border-gray-100 shadow-sm">
+      <header className="sticky top-20 z-30 bg-black border-b text-white border-gray-100 shadow-sm">
         <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Explore Events</h1>
+            <h1 className="text-lg font-bold text-gray-400">Explore Events</h1>
             <p className="text-xs text-gray-500 hidden sm:block">
               Discover events near you
             </p>
@@ -136,10 +136,10 @@ const ExplorePage = () => {
             {/* Map toggle */}
             <button
               onClick={() => setShowMap((p) => !p)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border cursor-pointer text-sm font-medium transition-colors ${
                 showMap
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "border-gray-200 text-gray-700 hover:border-indigo-300"
+                  ? "bg-purple-700 text-white border-indigo-600"
+                  : "border-purple-700 text-purple-700 hover:border-indigo-300"
               }`}
             >
               {showMap ? <LayoutGrid className="w-4 h-4" /> : <Map className="w-4 h-4" />}
@@ -185,7 +185,7 @@ const ExplorePage = () => {
           <main className="flex-1 min-w-0">
             {/* Section title */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-800">
+              <h2 className="font-semibold text-gray-400">
                 {Object.keys(activeFilters).length > 0 ? "Filtered Events" : "All Events"}
               </h2>
               {!exploreLoading && (
@@ -223,7 +223,7 @@ const ExplorePage = () => {
             {/* Nearby events strip (map-synced) */}
             {!showMap && nearbyEvents.length > 0 && (
               <div className="mt-8">
-                <h2 className="font-semibold text-gray-800 mb-4">Nearby You</h2>
+                <h2 className="font-semibold text-gray-400 mb-4">Nearby You</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {nearbyEvents.slice(0, 6).map((event) => (
                     <EventCard key={event._id} event={event} />

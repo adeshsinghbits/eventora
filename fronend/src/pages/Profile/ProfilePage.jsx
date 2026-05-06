@@ -197,7 +197,6 @@ const ProfilePage = () => {
     }),
     [myEvents, attendingEvents, savedEvents]
   );
-
   // ── Render guards ─────────────────────────────────────────────────────────
   if (loading && !user) return <ProfilePageSkeleton />;
   if (!isLoggedIn) return <UnauthenticatedState navigate={navigate} />;

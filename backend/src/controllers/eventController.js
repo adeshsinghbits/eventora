@@ -19,10 +19,22 @@ const parseBodyJSON = (req, fields) => {
 export const createEvent = asyncHandler(async (req, res) => {
   parseBodyJSON(req, ["location", "bannerImage", "faq", "rules", "tags"]);
 
+  const allowedStatus = ["draft", "published", "cancelled"];
+  const allowedVisibility = ["public", "private", "unlisted"];
+
+  const status = allowedStatus.includes(req.body.status)
+    ? req.body.status
+    : "draft";
+
+  const visibility = allowedVisibility.includes(req.body.visibility)
+    ? req.body.visibility
+    : "public";
+
   const event = await Event.create({
     ...req.body,
     organizer: req.user._id,
-    status: "published", 
+    status,
+    visibility,
   });
 
   res.status(201).json({ success: true, data: event });
@@ -53,6 +65,20 @@ export const updateEvent = asyncHandler(async (req, res) => {
 
   if (!event.isOrganizerOrCoHost(req.user._id)) {
     return res.status(403).json({ success: false, message: "Not authorized to update this event" });
+  }
+
+  if (req.body.status) {
+    const allowedStatus = ["draft", "published", "cancelled"];
+    if (!allowedStatus.includes(req.body.status)) {
+      delete req.body.status;
+    }
+  }
+
+  if (req.body.visibility) {
+    const allowedVisibility = ["public", "private", "unlisted"];
+    if (!allowedVisibility.includes(req.body.visibility)) {
+      delete req.body.visibility;
+    }
   }
 
   const forbidden = ["isDeleted", "createdAt", "attendees", "savedByUsers", "organizer"];
@@ -153,24 +179,58 @@ export const getAllEvents = asyncHandler(async (req, res) => {
     endDate,
     sortBy = "startDate",
     sortOrder = "asc",
+    myEvents,
+    status,
+    visibility,
   } = req.query;
-
-  console.log(req.query);
-  
 
   const pageNum = Math.max(parseInt(page) || 1, 1);
   const limitNum = Math.min(Math.max(parseInt(limit) || 20, 1), 100);
   const skip = (pageNum - 1) * limitNum;
 
-  const filter = {  isDeleted: false };
+  let filter = { isDeleted: false };
 
-  if (category && category !== "all") filter.category = category;
+  if (req.user) {
+    if (myEvents === "true") {
+      filter.organizer = req.user._id;
 
+      if (status) filter.status = status;
+      if (visibility) filter.visibility = visibility;
+
+    } else {
+      const visibilityConditions = [
+        { visibility: "public", status: "published" },
+        { visibility: "unlisted", status: "published" },
+        { organizer: req.user._id }, 
+      ];
+      filter.$or = visibilityConditions;
+      if (status || visibility) {
+        filter.$and = [
+          { $or: visibilityConditions },
+          {
+            ...(status && { status }),
+            ...(visibility && { visibility }),
+          },
+        ];
+        delete filter.$or;
+      }
+    }
+  } else {
+    filter.visibility = "public";
+    filter.status = "published";
+  }
+  if (category && category !== "all") {
+    filter.category = category;
+  }
   if (search?.trim()) {
-    filter.$or = [
-      { title: { $regex: search.trim(), $options: "i" } },
-      { description: { $regex: search.trim(), $options: "i" } },
-    ];
+    const searchFilter = {
+      $or: [
+        { title: { $regex: search.trim(), $options: "i" } },
+        { description: { $regex: search.trim(), $options: "i" } },
+      ],
+    };
+
+    filter = { $and: [filter, searchFilter] };
   }
 
   if (isFree !== undefined && isFree !== "") {
@@ -195,8 +255,9 @@ export const getAllEvents = asyncHandler(async (req, res) => {
     newest: { createdAt: -1 },
     startDate: { startDate: sortOrder === "desc" ? -1 : 1 },
   };
-  const sort = sortMap[sortBy] ?? sortMap.startDate;
-  
+
+  const sort = sortMap[sortBy] || sortMap.startDate;
+
   const [events, total] = await Promise.all([
     Event.find(filter)
       .sort(sort)
@@ -204,6 +265,7 @@ export const getAllEvents = asyncHandler(async (req, res) => {
       .limit(limitNum)
       .select("-attendees -savedByUsers -interestedUsers -faq -rules")
       .populate("organizer", "name profileImage"),
+
     Event.countDocuments(filter),
   ]);
 
@@ -219,8 +281,7 @@ export const getAllEvents = asyncHandler(async (req, res) => {
   });
 });
 
-// ── GET EVENT DETAILS ─────────────────────────────────────────────────────────
-// FIX: removed invalid attendees.length from .select() — use virtual instead
+// ── GET EVENT DETAILS ────────────────────────────────────────────────────────
 export const getEventDetails = asyncHandler(async (req, res) => {
   const event = await Event.findOne({
     _id: req.params.id,
@@ -231,13 +292,35 @@ export const getEventDetails = asyncHandler(async (req, res) => {
     .populate("coHosts", "name profileImage");
 
   if (!event) {
-    return res.status(404).json({ success: false, message: "Event not found" });
+    return res.status(404).json({
+      success: false,
+      message: "Event not found",
+    });
   }
 
-  event.incrementViews();
+  const isOwner = req.user && event.organizer._id.toString() === req.user._id.toString();
+
+  if (event.status === "draft" && !isOwner) {
+    return res.status(403).json({
+      success: false,
+      message: "This event is not published yet",
+    });
+  }
+
+  if (event.visibility === "private" && !isOwner) {
+    return res.status(403).json({
+      success: false,
+      message: "This event is private",
+    });
+  }
+
+  event.viewsCount = (event.viewsCount || 0) + 1;
   await event.save();
 
-  res.status(200).json({ success: true, data: event });
+  res.status(200).json({
+    success: true,
+    data: event,
+  });
 });
 
 // ── MY ORGANIZED EVENTS ───────────────────────────────────────────────────────

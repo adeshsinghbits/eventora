@@ -149,38 +149,45 @@ const EventCard = ({ event, isSaved = false, className = "" }) => {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        {/* Category */}
-        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full w-fit ${categoryColor}`}>
-          <Tag className="w-3 h-3" />
-          {category}
-        </span>
-
-        {/* Title */}
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${categoryColor}`}>
+            <Tag className="w-3 h-3" />
+            {category}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] font-medium bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+              {event.status}
+            </span>
+            <span className="text-[10px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+              {event.visibility}
+            </span>
+          </div>
+        </div>
         <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
           {title}
         </h3>
-
-        {/* Date */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>{formatDate(startDate)}{startTime && ` · ${startTime}`}</span>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <Calendar className="w-3.5 h-3.5" />
+          <span>
+            {formatDate(startDate)}
+            {startTime && <span className="ml-1 text-gray-400">· {startTime}</span>}
+          </span>
         </div>
-
-        {/* Venue */}
         {(venueName || city) && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="truncate">{venueName ? `${venueName}${city ? `, ${city}` : ""}` : city}</span>
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <MapPin className="w-3.5 h-3.5" />
+            <span className="truncate">
+              {venueName ? `${venueName}${city ? `, ${city}` : ""}` : city}
+            </span>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
-          <span className={`font-semibold text-sm ${isFree || price === 0 ? "text-green-600" : "text-gray-900"}`}>
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+          <span className={`font-semibold text-sm ${
+            isFree || price === 0 ? "text-green-600" : "text-gray-900"
+          }`}>
             {formatPrice(price, isFree, currency)}
           </span>
-
           {attendeeCount > 0 && (
             <span className="flex items-center gap-1 text-xs text-gray-400">
               <Users className="w-3.5 h-3.5" />
@@ -188,6 +195,7 @@ const EventCard = ({ event, isSaved = false, className = "" }) => {
             </span>
           )}
         </div>
+
       </div>
     </Link>
   );
