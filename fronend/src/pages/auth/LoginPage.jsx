@@ -209,17 +209,6 @@ const LoginPage = () => {
                 )}
               </motion.button>
             </motion.form>
-
-            {/* Divider */}
-            <motion.div variants={itemVariants} className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white text-slate-500">Or continue with</span>
-              </div>
-            </motion.div>
-
             {/* Sign Up Link */}
             <motion.div variants={itemVariants} className="mt-6 text-center text-sm">
               <span className="text-slate-600">Don't have an account? </span>
@@ -231,31 +220,6 @@ const LoginPage = () => {
               </Link>
             </motion.div>
           </motion.div>
-        </motion.div>
-
-        {/* Trust Indicators */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-8 flex items-center justify-center gap-6 text-xs text-slate-500"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span>Secure & Encrypted</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span>Privacy Protected</span>
-          </div>
         </motion.div>
       </motion.div>
     </div>

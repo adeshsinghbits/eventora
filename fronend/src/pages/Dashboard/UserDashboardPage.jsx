@@ -68,7 +68,7 @@ const EventRow = ({ event }) => {
 
   return (
     <Link
-      to={`/events/${slug || _id}`}
+      to={`/explore-events/${slug}-${_id}`}
       className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors group"
     >
       {/* Thumbnail */}
@@ -391,7 +391,7 @@ export default function UserDashboardPage() {
                 {upcomingAttending.slice(0, 4).map((e) => (
                   <Link
                     key={e._id}
-                    to={`/events/${e.slug || e._id}`}
+                    to={`/explore-events/${e.slug}-${e._id}`}
                     className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors group"
                   >
                     <div className="w-9 h-9 rounded-lg overflow-hidden bg-indigo-50 flex-shrink-0">

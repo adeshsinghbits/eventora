@@ -156,7 +156,7 @@ export default function Topbar() {
                   >
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
+                      className="w-full flex z-9999 items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
                     >
                       <FiLogOut size={16} />
                       Logout

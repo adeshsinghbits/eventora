@@ -113,7 +113,7 @@ const ExplorePage = () => {
   return (
     <div className="min-h-screen">
       {/* ── Header ── */}
-      <header className="sticky top-20 z-30 bg-black border-b text-white border-gray-100 shadow-sm">
+      <header className="sticky top-20 z-10 bg-black border-b text-white border-gray-100 shadow-sm">
         <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div>
             <h1 className="text-lg font-bold text-gray-400">Explore Events</h1>
