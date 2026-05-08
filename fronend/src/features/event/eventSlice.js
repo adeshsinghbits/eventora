@@ -203,8 +203,6 @@ export const reverseGeocodeLocation = createAsyncThunk(
   }
 );
 
-// ── Initial State ─────────────────────────────────────────────────────────────
-// FIX: granular loading flags instead of one global flag that blocks the whole UI
 const initialState = {
   // Explore grid
   exploreEvents: [],
