@@ -19,6 +19,7 @@ import EditEventPage from "./pages/Event/EditEventPage";
 import EventDetailPage from "./pages/Event/EventDetailPage";
 import SettingsPage from "./pages/settings/SettingsPage";
 import HelpPage from "./pages/help/HelpPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -208,7 +209,7 @@ function App() {
         />
 
         {/* ❌ Catch All */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
