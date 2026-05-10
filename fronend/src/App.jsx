@@ -20,6 +20,7 @@ import EventDetailPage from "./pages/Event/EventDetailPage";
 import SettingsPage from "./pages/settings/SettingsPage";
 import HelpPage from "./pages/help/HelpPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ForgotPassowrdPage from "./pages/auth/ForgotPassowrdPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -91,6 +92,14 @@ function App() {
           element={
             <PublicRoute>
               <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassowrdPage />
             </PublicRoute>
           }
         />
